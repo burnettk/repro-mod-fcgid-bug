@@ -54,10 +54,11 @@ RUN bundle install
 COPY . /app
 RUN mkdir -p /app/tmp
 
-RUN chgrp www-data -R /app/log /app/tmp && chmod g+w /app/log /app/tmp && \
+RUN chgrp www-data -R /app/log /app/tmp /app/Gemfile.lock && chmod g+w /app/log /app/tmp && \
   mkdir -p /app/public/stylesheets/cache /app/public/javascripts/cache && \
   chgrp www-data -R /app/public/stylesheets/cache /app/public/javascripts/cache && \
-  chmod g+w /app/public/stylesheets/cache /app/public/javascripts/cache
+  chmod g+w /app/public/stylesheets/cache /app/public/javascripts/cache && \
+  chmod g+w /app/Gemfile.lock
 
 RUN touch /app/log/production.log && chmod 0666 /app/log/production.log
 
