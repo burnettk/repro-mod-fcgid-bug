@@ -1,28 +1,14 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+    docker build .
+    # note image id generated
 
-Things you may want to cover:
+    docker run --rm THAT_IMAGE_ID
+    # note container id that is started
 
-* Ruby version
+    # in another shell
+    docker exec -it THAT_CONTAINER_ID bash
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+    # in the container
+    curl localhost/workers # should be at least 5, but is 1 or 2
+    ps aux | grep dispatch
