@@ -1,0 +1,102 @@
+# General Apache options
+<IfModule mod_fastcgi.c>
+  AddHandler fastcgi-script .fcgi
+</IfModule>
+<IfModule mod_fcgid.c>
+  AddHandler fcgid-script .fcgi
+</IfModule>
+#AddHandler cgi-script .cgi
+Options +FollowSymLinks +ExecCGI
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/atom_xml
+  AddOutputFilterByType DEFLATE application/x-javascript # Ubuntu 8.04, check /etc/mime.types
+  AddOutputFilterByType DEFLATE application/javascript # Ubuntu 9.10
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/x-httpd-php
+
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+  # Workaround for mishandling of ETags + mod_deflate in Apache, and
+  # a specific bug about formatting ETags in Apache 2.2.8.
+  # See:
+  # https://issues.apache.org/bugzilla/show_bug.cgi?id=45023
+  # https://issues.apache.org/bugzilla/show_bug.cgi?id=39727
+
+  # Always strip out "-gzip" from incoming ETags
+  RequestHeader edit "If-None-Match" "^\"(.*)-gzip\"$" "\"$1\""
+
+  # Fix the misformatting of Etags in Apache 2.2.8:
+  # (note, we can remove this once we're past Apache 2.2.8)
+  # change "257-493371c87f880"-gzip to "257-493371c87f880-gzip" 
+  Header edit "ETag" "^\"(.*)\"-gzip$" "\"$1\""
+
+  # Ensure that we create different ETags for compressed content.
+  # Save an environment variable if the client can handle gzipped responses:
+  SetEnvIf Accept-Encoding ".*gzip.*" CLIENT_SUPPORTS_GZIP=true
+  # Append -gzip to the ETag for these clients:
+  Header edit "ETag" "^\"(.*)(-gzip)?\"$" "\"$1-gzip\"" env=CLIENT_SUPPORTS_GZIP
+  # Note: the above solution will, in some cases, create two ETags (one with -gzip, one without)
+  # for the same content, if we don't compress the content (like images) and clients that don't
+  # specify "Accept-Encoding: gzip" make the request.  This might be a little inefficient but having
+  # two ETags for the same content is WAY BETTER than having multiple content renderings for the
+  # same ETag!
+</IfModule>
+
+# be sure not to use inode, because of clustering
+FileETag MTime Size
+
+# Specific non-asset-tagged file(s) that we want to allow to be cached:
+# 1209600 is 14 days
+<Files "favicon.ico">
+  Header onsuccess append Cache-Control "public"
+  Header onsuccess append Cache-Control "max-age=1209600"
+</Files>
+
+# If you don't want Rails to look in certain directories,
+# use the following rewrite rules so that Apache won't rewrite certain requests
+# 
+# Example:
+#   RewriteCond %{REQUEST_URI} ^/notrails.*
+#   RewriteRule .* - [L]
+
+# Redirect all requests not available on the filesystem to Rails
+# By default the cgi dispatcher is used which is very slow
+# 
+# For better performance replace the dispatcher with the fastcgi one
+#
+# Example:
+#   RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
+RewriteEngine On
+
+# If your Rails application is accessed via an Alias directive,
+# then you MUST also set the RewriteBase in this htaccess file.
+#
+# Example:
+#   Alias /myrailsapp /path/to/myrailsapp/public
+#   RewriteBase /myrailsapp
+
+RewriteRule ^$ index.html [QSA]
+RewriteRule ^([^.]+)$ $1.html [QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
+
+# In case Rails experiences terminal errors
+# Instead of displaying this message you can supply a file here which will be rendered instead
+# 
+# Example:
+#   ErrorDocument 500 /500.html
+
+ErrorDocument 500 "<h2>Application error</h2>Application failed to start properly"

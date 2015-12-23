@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+# Apache gets grumpy about PID files pre-existing
+rm -f /run/apache2.pid
+
+source /etc/apache2/envvars && exec /usr/sbin/apache2 -D FOREGROUND
