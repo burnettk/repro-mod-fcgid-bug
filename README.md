@@ -1,4 +1,6 @@
-== README
+# README
+
+The projects demonstrates a possible bug in mod_fcgid, where it ignores FcgidMinProcessesPerClass (and the deprecated DefaultMinClassProcessCount).
 
     docker build .
     # note image id generated
@@ -13,4 +15,4 @@
     curl localhost/workers
     ps aux | grep dispatch
 
-    # The number of workers should be at least 5, per fcgid.conf and DefaultMinClassProcessCount 5, but it is 1 or 2
+    # The number of workers should be at least 5, per fcgid.conf, which sets FcgidMinProcessesPerClass 5, but it is 1 or 2
