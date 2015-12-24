@@ -21,7 +21,7 @@ RUN gem install bundler
 
 # ruby-dev build-essential for compiling gems
 # libxml2-dev libxslt-dev zlib1g-dev for nokogiri
-RUN apt-get update && apt-get install -y ruby-dev build-essential libxml2-dev libxslt-dev zlib1g-dev libmysqlclient-dev libfcgi-dev apache2 libapache2-mod-fcgid mysql-client curl less vim --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y siege ruby-dev build-essential libxml2-dev libxslt-dev zlib1g-dev libmysqlclient-dev libfcgi-dev apache2 libapache2-mod-fcgid mysql-client curl less vim --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 ADD fcgid.conf /etc/apache2/mods-available/fcgid.conf
 RUN a2enmod alias auth_basic authn_file authnz_ldap authz_groupfile authz_host authz_user autoindex cgi deflate dir env fcgid filter ldap mime negotiation rewrite setenvif ssl status headers include
