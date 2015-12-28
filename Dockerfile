@@ -62,4 +62,7 @@ RUN chgrp www-data -R /app/log /app/tmp /app/Gemfile.lock && chmod g+w /app/log 
 
 RUN touch /app/log/production.log && chmod 0666 /app/log/production.log
 
+# to mess around with config files, just run a tail as the main container process and start httpd-foreground manually
+# CMD tail -f /app/Gemfile
+
 CMD ["httpd-foreground"]

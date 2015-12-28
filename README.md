@@ -1,17 +1,15 @@
 # README
 
-The projects demonstrates a possible bug in mod_fcgid, where it ignores FcgidMinProcessesPerClass (and the deprecated DefaultMinClassProcessCount).
+The projects demonstrates a possible bug in mod_fcgid, where it ignores FcgidMinProcessesPerClass. See [the full fcgid.conf](fcgid.conf).
 
-    docker build .
-    # note image id generated
+    docker build -t repro-mod-fcgid-bug .
 
-    docker run --rm THAT_IMAGE_ID
-    # note container id that is started
+    docker run --name fcgid-bug --rm repro-mod-fcgid-bug
 
     # in another shell
-    docker exec -it THAT_CONTAINER_ID bash
+    docker exec -it fcgid-bug bash
 
-    # in the container
+    # in the resulting container shell
     curl localhost/workers
     ps aux | grep dispatch
 
@@ -22,3 +20,17 @@ The projects demonstrates a possible bug in mod_fcgid, where it ignores FcgidMin
 
     # repeat above steps to check number of workers. it'll be more...
     # does FcgidMinProcessesPerClass not work?
+
+## Environment details
+
+    alias runftw='docker exec -it fcgid-bug'
+
+    $ runftw apachectl -v                                                                                                                                                        [2.2.0]
+    Server version: Apache/2.4.7 (Ubuntu)
+    Server built:   Oct 14 2015 14:20:21
+
+    $ runftw apt-cache show libapache2-mod-fcgid | grep Version                                                                                                                  [2.2.0]
+    Version: 1:2.3.9-1
+
+    $ runftw lsb_release -d                                                                                                                                                      [2.2.0]
+    Description:Ubuntu 14.04.3 LTS
