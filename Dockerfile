@@ -1,7 +1,7 @@
 FROM ubuntu:14.04.3
 
 RUN apt-get update && \
-    apt-get install -y locales && \
+    apt-get install -y locales build-essential libssl-dev libreadline-dev wget git-core software-properties-common python-software-properties && \
     locale-gen en_US.UTF-8 && \
     /usr/sbin/update-locale LANG=en_US.UTF-8 && \
     apt-get clean
@@ -9,10 +9,8 @@ RUN apt-get update && \
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-# Install tools & libs to compile everything
-RUN apt-get update && apt-get install -y build-essential libssl-dev libreadline-dev wget && apt-get clean
+RUN add-apt-repository ppa:ondrej/apache2 -y
 
-RUN apt-get install -y git-core && apt-get clean
 RUN git clone https://github.com/sstephenson/ruby-build.git && cd ruby-build && ./install.sh
 
 ENV CONFIGURE_OPTS --disable-install-rdoc

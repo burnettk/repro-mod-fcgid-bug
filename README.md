@@ -25,9 +25,9 @@ The projects demonstrates a possible bug in mod_fcgid, where it ignores FcgidMin
 
     alias runftw='docker exec -it fcgid-bug'
 
-    $ runftw apachectl -v                                                                                                                                                        [2.2.0]
-    Server version: Apache/2.4.7 (Ubuntu)
-    Server built:   Oct 14 2015 14:20:21
+    $ runftw apachectl -v
+    Server version: Apache/2.4.18 (Ubuntu)
+    Server built:   2015-12-16T00:00:00
 
     $ runftw apt-cache show libapache2-mod-fcgid | grep Version                                                                                                                  [2.2.0]
     Version: 1:2.3.9-1
